@@ -6,6 +6,15 @@ public class Rook extends Piece {
         super(colour);
     }
 
+    @Override
+    public boolean isValidMove() {
+        return false;
+    }
+
+    @Override
+    public char getSymbol() {
+        return 'R';
+    }
 
 }
 

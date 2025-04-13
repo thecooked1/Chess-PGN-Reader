@@ -1,7 +1,4 @@
 package Pieces;
-
-public class Colour {
-    public enum colour {
-        WHITE, BLACK
-    }
+public enum Colour {
+    WHITE, BLACK
 }

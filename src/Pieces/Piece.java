@@ -1,7 +1,7 @@
 package Pieces;
 
-public abstract class Piece {
 
+public abstract class Piece {
     protected Colour colour;
 
     public Piece(Colour colour){
@@ -11,6 +11,10 @@ public abstract class Piece {
     public Colour getColor() {
         return colour ;
     }
+
+    public abstract boolean isValidMove();
+    public abstract char getSymbol();
+
 
 
 
