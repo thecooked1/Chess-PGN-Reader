@@ -2,8 +2,8 @@ package Board;
 
 
 public class Tile {
-    private int rowCoordinate;
-    private int colCoordinate;
+    private final int rowCoordinate;
+    private final int colCoordinate;
 
     public Tile (int rowCoordinate, int colCoordinate){
         this.rowCoordinate = rowCoordinate;
@@ -13,15 +13,44 @@ public class Tile {
     // translate from Algebraic
 
     public static Tile translate(String n){
-        int col = n.charAt(0) - 'a';
-        int row = 8 - Character.getNumericValue(n.charAt(1));
-        return new Tile(row,col);
+        if (n == null || n.length() != 2) {
+            throw new IllegalArgumentException("Invalid tile: " + n);
+        }
+
+        char file = n.charAt(0);
+        char rank = n.charAt(1);
+
+        if (file < 'a' || file > 'h' || rank < '1' || rank > '8') {
+            throw new IllegalArgumentException("Invalid tile: " + n);
+        }
+
+        int col = file - 'a';
+        int row = 8 - Character.getNumericValue(rank);
+        return new Tile(row, col);
     }
 
     public String toAlgebraic() {
         char file = (char) ('a' + colCoordinate);
         int rank = 8 - rowCoordinate;
         return "" + file + rank;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Tile tile = (Tile) o;
+        return rowCoordinate == tile.rowCoordinate && colCoordinate == tile.colCoordinate;
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * rowCoordinate + colCoordinate;
+    }
+
+    @Override
+    public String toString() {
+        return toAlgebraic();
     }
 
     public int getRow () { return rowCoordinate; }
