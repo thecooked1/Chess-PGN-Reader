@@ -6,6 +6,10 @@ public class Tile {
     private final int colCoordinate;
 
     public Tile (int rowCoordinate, int colCoordinate){
+        if (rowCoordinate < 0 || rowCoordinate > 7 || colCoordinate < 0 || colCoordinate > 7) {
+            throw new IllegalArgumentException("Invalid tile coordinates: " + rowCoordinate +
+                    ", " + colCoordinate);
+        }
         this.rowCoordinate = rowCoordinate;
         this.colCoordinate = colCoordinate;
     }

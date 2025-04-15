@@ -8,6 +8,8 @@ public class Parser {
 
     private final Map<String, String> headers = new HashMap<>();
     private final List<String> moves = new ArrayList<>();
+    private String result;
+
 
     public void loadPGN(File file) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -15,14 +17,20 @@ public class Parser {
         StringBuilder moveSection = new StringBuilder();
 
         while ((line = reader.readLine()) != null) {
+            line = line.trim();
+            if (line.isEmpty()) continue; // skip empty lines
+
             if (line.startsWith("[")) {
                 parseHeader(line);
-            } else {
+            } else if (Character.isDigit(line.charAt(0))) {
                 moveSection.append(line).append(" ");
+            } else {
+                throw new IOException("Unexpected line in PGN: " + line);
             }
         }
-
         parseMoves(moveSection.toString().trim());
+
+
     }
 
     private void parseHeader(String line) {
@@ -42,11 +50,20 @@ public class Parser {
 
         String[] tokens = movesString.split(" ");
         for (String token : tokens) {
-            if (!token.isEmpty() && !token.contains("1-0") && !token.contains("0-1") && !token.contains("1/2-1/2")) {
+            if (token.equals("1-0") || token.equals("0-1") || token.equals("1/2-1/2")) {
+                result = token;
+            } else if (!token.isEmpty()) {
                 moves.add(token);
             }
         }
+
+
     }
+
+    public String getResult() {
+        return result;
+    }
+
 
     public Map<String, String> getHeaders() {
         return headers;
