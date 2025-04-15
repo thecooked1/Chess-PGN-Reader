@@ -7,7 +7,7 @@ public class Queen extends Piece{
     }
 
     @Override
-    public boolean isValidMove() {
+    public boolean isValidMove(int fromRow, int fromCol, int toRow, int toCol, Piece[][] board) {
         return false;
     }
 

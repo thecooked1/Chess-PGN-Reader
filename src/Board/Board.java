@@ -5,13 +5,44 @@ import Pieces.*;
 
 public class Board {
 
-    private Piece[][] grid;
+    private final Piece[][] grid;
 
     public Board(){
         grid = new Piece[8][8];
         setupInitialPosition();
 
     }
+
+    public boolean applyMove(PGNParser.Move move, boolean isWhiteTurn) {
+        String pieceType = move.getPiece(); // "P", "N", "B", "R", "Q", "K"
+        char targetFile = move.getTargetFile(); // 'a' to 'h'
+        int targetRank = move.getTargetRank();  // 1 to 8
+
+        int targetCol = targetFile - 'a';
+        int targetRow = 8 - targetRank;
+
+        Colour currentColour = isWhiteTurn ? Colour.WHITE : Colour.BLACK;
+
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                Piece piece = grid[row][col];
+                if (piece != null &&
+                        piece.getColor() == currentColour &&
+                        Character.toString(piece.getSymbol()).equalsIgnoreCase(pieceType)) {
+
+                    if (piece.isValidMove(row, col, targetRow, targetCol, grid)) {
+                        // Make the move
+                        grid[targetRow][targetCol] = piece;
+                        grid[row][col] = null;
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false; // No legal piece found to apply this move
+    }
+
 
     public void setupInitialPosition(){
 

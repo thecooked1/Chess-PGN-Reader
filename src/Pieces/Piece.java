@@ -12,7 +12,7 @@ public abstract class Piece {
         return colour ;
     }
 
-    public abstract boolean isValidMove();
+    public abstract boolean isValidMove(int fromRow, int fromCol, int toRow, int toCol, Piece[][] board);
     public abstract char getSymbol();
 
 
