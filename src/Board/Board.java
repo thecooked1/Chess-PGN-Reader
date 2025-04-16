@@ -6,6 +6,8 @@ import Pieces.*;
 public class Board {
 
     private final Piece[][] grid;
+    private int[] enPassantTarget; // {row, col}
+
 
     public Board(){
         grid = new Piece[8][8];
@@ -31,9 +33,91 @@ public class Board {
                         Character.toString(piece.getSymbol()).equalsIgnoreCase(pieceType)) {
 
                     if (piece.isValidMove(row, col, targetRow, targetCol, grid)) {
-                        // Make the move
+
+                        // Handle en passant capture
+                        if (piece instanceof Pawn &&
+                                targetCol != col &&
+                                grid[targetRow][targetCol] == null &&
+                                enPassantTarget != null &&
+                                enPassantTarget[0] == targetRow &&
+                                enPassantTarget[1] == targetCol) {
+
+                            int pawnRow = currentColour == Colour.WHITE ? targetRow + 1 : targetRow - 1;
+                            grid[pawnRow][targetCol] = null; // Remove captured pawn
+                        }
+
+                        // Handle promotion
+                        if (piece instanceof Pawn && (targetRow == 0 || targetRow == 7)) {
+                            switch (move.getPromotion()) {
+                                case "Q": piece = new Queen(currentColour); break;
+                                case "R": piece = new Rook(currentColour); break;
+                                case "B": piece = new Bishop(currentColour); break;
+                                case "N": piece = new Knight(currentColour); break;
+                            }
+                        }
+
+                        // Handle castling
+                        if (piece instanceof King && Math.abs(targetCol - col) == 2) {
+                            King king = (King) piece;
+
+                            // Castling
+                            if (!king.hasMoved()) {
+                                int rookCol = (targetCol == 6) ? 7 : 0;
+                                Piece rookPiece = grid[row][rookCol];
+                                if (rookPiece instanceof Rook) {
+                                    Rook rook = (Rook) rookPiece;
+
+                                    if (!rook.hasMoved()) {
+                                        int direction = (targetCol == 6) ? 1 : -1;
+
+                                        // Ensure path is clear
+                                        boolean clear = true;
+                                        for (int c = col + direction; c != rookCol; c += direction) {
+                                            if (grid[row][c] != null) {
+                                                clear = false;
+                                                break;
+                                            }
+                                        }
+
+                                        // Optional: Check if king is in check or would pass through check
+
+                                        if (clear) {
+                                            // Move king
+                                            grid[targetRow][targetCol] = king;
+                                            grid[row][col] = null;
+
+                                            // Move rook
+                                            int rookTargetCol = (targetCol == 6) ? 5 : 3;
+                                            grid[row][rookTargetCol] = rook;
+                                            grid[row][rookCol] = null;
+
+                                            king.setMoved(true);
+                                            rook.setMoved(true);
+                                            return true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // Handle en passant target square (double pawn push)
+                        if (piece instanceof Pawn && Math.abs(targetRow - row) == 2) {
+                            enPassantTarget = new int[]{(row + targetRow) / 2, col};
+                        } else {
+                            enPassantTarget = null;
+                        }
+
+                        // Apply the move
                         grid[targetRow][targetCol] = piece;
                         grid[row][col] = null;
+
+                        if (piece instanceof King) {
+                            ((King) piece).setMoved(true);
+                        }
+                        if (piece instanceof Rook) {
+                            ((Rook) piece).setMoved(true);
+                        }
+
                         return true;
                     }
                 }
@@ -42,7 +126,6 @@ public class Board {
 
         return false; // No legal piece found to apply this move
     }
-
 
     public void setupInitialPosition(){
 

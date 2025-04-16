@@ -2,6 +2,16 @@ package Pieces;
 
 public class Rook extends Piece {
 
+    private boolean hasMoved = false;
+
+    public boolean hasMoved() {
+        return hasMoved;
+    }
+
+    public void setMoved(boolean moved) {
+        this.hasMoved = moved;
+    }
+
     public Rook(Colour colour){
         super(colour);
     }
