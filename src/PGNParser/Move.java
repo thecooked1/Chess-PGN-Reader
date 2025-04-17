@@ -1,15 +1,19 @@
 package PGNParser;
 
 public class Move {
-    private String piece;
+    private String piece = "P"; // Defaults to Pawn
     private char targetFile;
     private int targetRank;
-    private boolean isCapture;
-    private boolean isCheck;
-    private boolean isCheckmate;
-    private String disambiguation;
-    private String promotion;
+    private boolean isCapture = false;
+    private boolean isCheck = false;
+    private boolean isCheckmate = false;
+    private String disambiguation = "";
+    private String promotion = null;
     private String raw;
+
+    // Castling support
+    private boolean isKingsideCastle = false;
+    private boolean isQueensideCastle = false;
 
     public Move(String raw) {
         this.raw = raw;
@@ -25,6 +29,8 @@ public class Move {
     public String getDisambiguation() { return disambiguation; }
     public String getPromotion() { return promotion; }
     public String getRaw() { return raw; }
+    public boolean isKingsideCastle() { return isKingsideCastle; }
+    public boolean isQueensideCastle() { return isQueensideCastle; }
 
     // Setters
     public void setPiece(String piece) { this.piece = piece; }
@@ -35,6 +41,8 @@ public class Move {
     public void setCheckmate(boolean checkmate) { isCheckmate = checkmate; }
     public void setDisambiguation(String disambiguation) { this.disambiguation = disambiguation; }
     public void setPromotion(String promotion) { this.promotion = promotion; }
+    public void setKingsideCastle(boolean kingsideCastle) { isKingsideCastle = kingsideCastle; }
+    public void setQueensideCastle(boolean queensideCastle) { isQueensideCastle = queensideCastle; }
 
     @Override
     public String toString() {

@@ -22,10 +22,26 @@ public class Game {
     }
 
 
-
-    public void loadAndPlayPGN(File file) {
+    public boolean loadAndPlayPGN(String pgnContent) {
         try {
-            parser.loadPGN(file);
+            // Remove tags like [Event "..."]
+            StringBuilder movesOnly = new StringBuilder();
+            String[] lines = pgnContent.split("\\r?\\n");
+
+            for (String line : lines) {
+                if (!line.startsWith("[") && !line.isBlank()) {
+                    movesOnly.append(line.trim()).append(" ");
+                }
+            }
+
+            // Remove result at the end if present (1-0, 0-1, 1/2-1/2, *)
+            String cleanedMoves = movesOnly.toString()
+                    .replaceAll("\\d+\\.\\.\\.", "")         // remove "1..."
+                    .replaceAll("\\d+\\.", "")               // remove "1."
+                    .replaceAll("1-0|0-1|1/2-1/2|\\*", "")   // remove results
+                    .trim();
+
+            parser.loadPGNFromString(cleanedMoves);
             List<String> moveTokens = parser.getMoves();
 
             int moveNumber = 1;
@@ -35,25 +51,24 @@ public class Game {
                 System.out.println((whiteToMove ? moveNumber + ". " : "") +
                         (whiteToMove ? "White" : "Black") + ": " + token);
 
-
                 boolean moveApplied = board.applyMove(move, whiteToMove);
 
                 if (!moveApplied) {
                     System.err.println("Illegal move at " + (whiteToMove ? "White" : "Black") +
                             " move " + moveNumber + ": " + token);
-                    return;
+                    return false; // Invalid game
                 }
 
                 whiteToMove = !whiteToMove;
-                if (whiteToMove) moveNumber++; // Increment after Black moves
+                if (whiteToMove) moveNumber++;
             }
 
             System.out.println("Game finished. Result: " + parser.getResult());
+            return true;
 
-        } catch (IOException e) {
-            System.err.println("Failed to read PGN file: " + e.getMessage());
         } catch (Exception e) {
-            System.err.println("Unexpected error during game execution: " + e.getMessage());
+            System.err.println("Error while parsing game: " + e.getMessage());
+            return false;
         }
     }
 }

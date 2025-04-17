@@ -1,29 +1,61 @@
 import PGNParser.Parser;
-import java.io.File;
-import java.io.IOException;
+import Game.Game;
+
+import java.io.*;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
+        File pgnFile = new File("Tbilisi2015.pgn"); // change to actual path
+
         try {
-            Parser parser = new Parser();
-            parser.loadPGN(new File("Tbilisi2015.pgn"));
+            List<String> allGames = splitIntoGames(pgnFile);
+            int gameNumber = 1;
 
-            System.out.println("=== Headers ===");
-            parser.getHeaders().forEach((key, value) -> System.out.println(key + ": " + value));
+            for (String singleGame : allGames) {
+                System.out.println("Validating Game " + gameNumber + ":");
 
-            System.out.println("\n=== Moves ===");
-            int moveNum = 1;
-            for (int i = 0; i < parser.getMoves().size(); i += 2) {
-                String whiteMove = parser.getMoves().get(i);
-                String blackMove = (i + 1 < parser.getMoves().size()) ? parser.getMoves().get(i + 1) : "...";
-                System.out.printf("%d. %s %s\n", moveNum++, whiteMove, blackMove);
+                Parser parser = new Parser();
+                parser.loadPGNFromString(singleGame); // new method
+
+                Game game = new Game();
+                boolean isValid = game.loadAndPlayPGN(singleGame);
+
+                if (isValid) {
+                    System.out.println("✅ Game " + gameNumber + " is valid.\n");
+                } else {
+                    System.out.println("❌ Game " + gameNumber + " has invalid moves.\n");
+                }
+
+                gameNumber++;
             }
 
-            System.out.println("\n=== Result ===");
-            System.out.println(parser.getResult());
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            System.err.println("Error reading PGN file: " + e.getMessage());
         }
+    }
+
+    // File-level utility, should stay in Main
+    private static List<String> splitIntoGames(File file) throws IOException {
+        List<String> games = new ArrayList<>();
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        StringBuilder currentGame = new StringBuilder();
+
+        String line;
+        while ((line = reader.readLine()) != null) {
+            if (line.startsWith("[Event ")) {
+                if (currentGame.length() > 0) {
+                    games.add(currentGame.toString().trim());
+                    currentGame.setLength(0);
+                }
+            }
+            currentGame.append(line).append("\n");
+        }
+
+        if (currentGame.length() > 0) {
+            games.add(currentGame.toString().trim());
+        }
+
+        return games;
     }
 }

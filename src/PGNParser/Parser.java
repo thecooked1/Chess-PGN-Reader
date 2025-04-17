@@ -33,6 +33,31 @@ public class Parser {
 
     }
 
+    public void loadPGNFromString(String pgnContent) throws IOException {
+        headers.clear();
+        moves.clear();
+        result = null;
+
+        String[] lines = pgnContent.split("\n");
+        StringBuilder moveSection = new StringBuilder();
+
+        for (String line : lines) {
+            line = line.trim();
+            if (line.isEmpty()) continue;
+
+            if (line.startsWith("[")) {
+                parseHeader(line);
+            } else if (Character.isDigit(line.charAt(0))) {
+                moveSection.append(line).append(" ");
+            } else {
+                throw new IOException("Unexpected line in PGN: " + line);
+            }
+        }
+
+        parseMoves(moveSection.toString().trim());
+    }
+
+
     private void parseHeader(String line) {
         // Example: [White "Magnus Carlsen"]
         int firstQuote = line.indexOf("\"");
