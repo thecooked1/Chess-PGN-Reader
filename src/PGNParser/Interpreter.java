@@ -20,33 +20,48 @@ public class Interpreter {
             t = t.substring(0, idx);
         }
 
-        if (t.equals("O-O") || t.equals("O-O-O")) {
-            move.setPiece("K"); // King is moving
-            move.setTargetFile(t.equals("O-O") ? 'g' : 'c');
-            move.setTargetRank(-1); // Set dynamically based on color
+        if (t.equals("O-O")) { // KingSide
+            move.setPiece("K"); // King is the piece moving
+            move.setKingsideCastle(true);
+            move.setTargetFile('g');
+            move.setTargetRank(-1);
+            return move;
+        } else if (t.equals("O-O-O")) { // QueenSide
+            move.setPiece("K");
+            move.setQueensideCastle(true);
+            move.setTargetFile('c');
+            move.setTargetRank(-1);
             return move;
         }
 
         move.setCapture(t.contains("x"));
         t = t.replace("x", "");
 
-        // If it starts with a piece char, pull it out
         if ("KQRBN".indexOf(t.charAt(0)) != -1) {
             move.setPiece(String.valueOf(t.charAt(0)));
             t = t.substring(1);
         } else {
-            move.setPiece("P"); // Default to pawn
+            move.setPiece("P");
         }
 
-        // Disambiguation (e.g., Nbd2 or R1e2)
-        if (t.length() == 3) {
+        // Disambiguation
+        int len = t.length();
+        if (len == 3) {
             move.setDisambiguation(String.valueOf(t.charAt(0)));
             move.setTargetFile(t.charAt(1));
             move.setTargetRank(Character.getNumericValue(t.charAt(2)));
-        } else {
+        } else if (len == 2) {
             move.setTargetFile(t.charAt(0));
             move.setTargetRank(Character.getNumericValue(t.charAt(1)));
+        } else if (len == 4) {
+            // full disambiguation
+            move.setDisambiguation(t.substring(0, 2));
+            move.setTargetFile(t.charAt(2));
+            move.setTargetRank(Character.getNumericValue(t.charAt(3)));
+        } else {
+            throw new IllegalArgumentException("Unrecognized move format: " + token);
         }
+
 
         return move;
     }

@@ -11,7 +11,6 @@ public class Move {
     private String promotion = null;
     private String raw;
 
-    // Castling support
     private boolean isKingsideCastle = false;
     private boolean isQueensideCastle = false;
 
@@ -19,7 +18,6 @@ public class Move {
         this.raw = raw;
     }
 
-    // Getters
     public String getPiece() { return piece; }
     public char getTargetFile() { return targetFile; }
     public int getTargetRank() { return targetRank; }
@@ -32,7 +30,6 @@ public class Move {
     public boolean isKingsideCastle() { return isKingsideCastle; }
     public boolean isQueensideCastle() { return isQueensideCastle; }
 
-    // Setters
     public void setPiece(String piece) { this.piece = piece; }
     public void setTargetFile(char targetFile) { this.targetFile = targetFile; }
     public void setTargetRank(int targetRank) { this.targetRank = targetRank; }
@@ -43,6 +40,10 @@ public class Move {
     public void setPromotion(String promotion) { this.promotion = promotion; }
     public void setKingsideCastle(boolean kingsideCastle) { isKingsideCastle = kingsideCastle; }
     public void setQueensideCastle(boolean queensideCastle) { isQueensideCastle = queensideCastle; }
+
+    public String getTargetSquare() {
+        return "" + targetFile + targetRank;
+    }
 
     @Override
     public String toString() {

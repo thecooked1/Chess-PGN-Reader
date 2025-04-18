@@ -1,31 +1,39 @@
 package Pieces;
+import Board.Board;
 
 public class Bishop extends Piece {
 
     public Bishop(Colour colour) {
         super(colour);
+        this.symbol = 'B';
     }
 
     @Override
-    public boolean isValidMove(int fromRow, int fromCol, int toRow, int toCol, Piece[][] board) {
-        int rowDiff = Math.abs(toRow - fromRow);
-        int colDiff = Math.abs(toCol - fromCol);
-
-        if (rowDiff != colDiff) return false;
-
-        int rowStep = (toRow - fromRow) > 0 ? 1 : -1;
-        int colStep = (toCol - fromCol) > 0 ? 1 : -1;
-
-        for (int i = 1; i < rowDiff; i++) {
-            if (board[fromRow + i * rowStep][fromCol + i * colStep] != null) return false;
+    public boolean isValidMove(int fromRow, int fromCol, int toRow, int toCol, Board board) {
+        // Must move diagonally
+        if (Math.abs(toRow - fromRow) != Math.abs(toCol - fromCol)) {
+            return false;
+        }
+        if (fromRow == toRow && fromCol == toCol) {
+            return false;
         }
 
-        Piece target = board[toRow][toCol];
-        return target == null || target.getColor() != colour;
+        // Check if the path is clear
+        if (!isPathClear(fromRow, fromCol, toRow, toCol, board)) {
+            return false;
+        }
+
+        // Check the target square
+        Piece targetPiece = board.getPiece(toRow, toCol);
+        if (targetPiece == null) {
+            return true;
+        } else {
+            return targetPiece.getColor() != this.colour; // Can capture opponent's piece
+        }
     }
 
     @Override
     public char getSymbol() {
-        return 'B';
+        return symbol;
     }
 }

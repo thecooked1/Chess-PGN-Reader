@@ -3,73 +3,99 @@ import Board.Board;
 import PGNParser.Interpreter;
 import PGNParser.Move;
 import PGNParser.Parser;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public class Game {
+    private final Interpreter interpreter = new Interpreter();
 
-    private final Board board;
-    private final Parser parser;
-    private final Interpreter interpreter;
-    private boolean whiteToMove = true;
+    public boolean playGame(Parser.PGNGame game, int gameNumber) {
+        Board board = new Board(); // Reset board
+        boolean whiteToMove = true;
+        List<String> moveTokens = game.getMoves();
+        int moveNumber = 1;
+        int halfMoveClock = 0;
 
-    public Game() {
-        this.board = new Board();
-        this.parser = new Parser();
-        this.interpreter = new Interpreter();
-    }
+        System.out.println("=== Playing Game #" + gameNumber + " ===");
+        System.out.println("White: " + game.getHeaders().getOrDefault("White", "Unknown"));
+        System.out.println("Black: " + game.getHeaders().getOrDefault("Black", "Unknown"));
+        System.out.println("Event: " + game.getHeaders().getOrDefault("Event", "Unknown"));
+        // board.printBoard();
 
-
-    public boolean loadAndPlayPGN(String pgnContent) {
         try {
-            // Remove tags like [Event "..."]
-            StringBuilder movesOnly = new StringBuilder();
-            String[] lines = pgnContent.split("\\r?\\n");
-
-            for (String line : lines) {
-                if (!line.startsWith("[") && !line.isBlank()) {
-                    movesOnly.append(line.trim()).append(" ");
-                }
-            }
-
-            // Remove result at the end if present (1-0, 0-1, 1/2-1/2, *)
-            String cleanedMoves = movesOnly.toString()
-                    .replaceAll("\\d+\\.\\.\\.", "")         // remove "1..."
-                    .replaceAll("\\d+\\.", "")               // remove "1."
-                    .replaceAll("1-0|0-1|1/2-1/2|\\*", "")   // remove results
-                    .trim();
-
-            parser.loadPGNFromString(cleanedMoves);
-            List<String> moveTokens = parser.getMoves();
-
-            int moveNumber = 1;
             for (String token : moveTokens) {
-                Move move = interpreter.parseMove(token);
+                Move move = null;
+                // Parsing phase
+                try {
+                    move = interpreter.parseMove(token);
+                } catch (IllegalArgumentException e) {
+                    System.err.println("\nERROR in Game #" + gameNumber + " (Move " + moveNumber + " " + (whiteToMove ? "White" : "Black") + "):");
+                    System.err.println("Failed to parse move token: '" + token + "'");
+                    System.err.println("Reason: " + e.getMessage());
+                    return false;
+                }
 
-                System.out.println((whiteToMove ? moveNumber + ". " : "") +
-                        (whiteToMove ? "White" : "Black") + ": " + token);
-
+                // Game Replay Phase
+                String player = whiteToMove ? "White" : "Black";
+                String moveNumStr = whiteToMove ? moveNumber + "." : moveNumber + "...";
+                System.out.println(moveNumStr + " " + player + ": " + token);
                 boolean moveApplied = board.applyMove(move, whiteToMove);
+                // board.printBoard();
 
                 if (!moveApplied) {
-                    System.err.println("Illegal move at " + (whiteToMove ? "White" : "Black") +
-                            " move " + moveNumber + ": " + token);
-                    return false; // Invalid game
+                    System.err.println("\nERROR in Game #" + gameNumber + " (Move " + moveNumber + " " + player + "):");
+                    System.err.println("Illegal move detected for token: '" + token + "'");
+                    // board.printBoard();
+                    return false;
                 }
 
                 whiteToMove = !whiteToMove;
-                if (whiteToMove) moveNumber++;
+                if (whiteToMove) {
+                    moveNumber++;
+                }
+                halfMoveClock++;
             }
 
-            System.out.println("Game finished. Result: " + parser.getResult());
-            return true;
-
         } catch (Exception e) {
-            System.err.println("Error while parsing game: " + e.getMessage());
+
+            System.err.println("\nUNEXPECTED ERROR in Game #" + gameNumber + " around move: " + moveNumber + " (" + (whiteToMove ? "White" : "Black") + ")");
+            System.err.println("Move token being processed: '" + (moveTokens.size() > halfMoveClock ? moveTokens.get(halfMoveClock) : "N/A") + "'");
+            System.err.println("Error message: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
+
+        System.out.println("Game #" + gameNumber + " finished successfully. Result: " + game.getResult() + '\n');
+        return true;
+    }
+
+    public void playAllGames(Parser parser) {
+        int gameIndex = 1;
+        int successfulGames = 0;
+        int failedGames = 0;
+
+        if (parser.getGames().isEmpty()) {
+            System.out.println("No games found in the PGN data.");
+            return;
+        }
+
+        for (Parser.PGNGame game : parser.getGames()) {
+            boolean gamePlayedSuccessfully = playGame(game, gameIndex);
+
+            if (!gamePlayedSuccessfully) {
+                System.err.println("--- Game #" + gameIndex + " aborted due to error. Skipping to next game. ---");
+                failedGames++;
+            } else {
+                successfulGames++;
+            }
+            gameIndex++;
+        }
+
+        System.out.println("\n=========================================");
+        System.out.println("=== Finished processing all games ===");
+        System.out.println("Total Games Found: " + parser.getGames().size());
+        System.out.println("Successfully Processed: " + successfulGames);
+        System.out.println("Failed/Aborted: " + failedGames);
+        System.out.println("=========================================");
     }
 }
-

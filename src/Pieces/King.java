@@ -1,4 +1,5 @@
 package Pieces;
+import Board.Board;
 
 public class King extends Piece {
 
@@ -6,6 +7,8 @@ public class King extends Piece {
 
     public King(Colour colour) {
         super(colour);
+        this.symbol = 'K';
+        this.hasMoved = false;
     }
 
     public boolean hasMoved() {
@@ -16,23 +19,25 @@ public class King extends Piece {
         this.hasMoved = moved;
     }
 
-
     @Override
-    public boolean isValidMove(int fromRow, int fromCol, int toRow, int toCol, Piece[][] board) {
+    public boolean isValidMove(int fromRow, int fromCol, int toRow, int toCol, Board board) {
         int rowDiff = Math.abs(fromRow - toRow);
         int colDiff = Math.abs(fromCol - toCol);
 
-        if (rowDiff <= 1 && colDiff <= 1) {
-            Piece target = board[toRow][toCol];
-            return target == null || target.getColor() != colour;
+        // King move
+        if (rowDiff <= 1 && colDiff <= 1 && (rowDiff != 0 || colDiff != 0)) {
+            Piece targetPiece = board.getPiece(toRow, toCol);
+            if (targetPiece == null) {
+                return true;
+            } else {
+                return targetPiece.getColor() != this.colour; // Can capture opponent's piece
+            }
         }
-
-
         return false;
     }
 
     @Override
     public char getSymbol() {
-        return 'K';
+        return symbol;
     }
 }
