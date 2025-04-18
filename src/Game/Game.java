@@ -50,6 +50,7 @@ public class Game {
                     return false;
                 }
 
+
                 whiteToMove = !whiteToMove;
                 if (whiteToMove) {
                     moveNumber++;

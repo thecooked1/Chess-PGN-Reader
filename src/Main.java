@@ -14,6 +14,8 @@ public class Main {
             game.playAllGames(parser);
         } catch (IOException e) {
             System.err.println("Error reading PGN file: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("An unexpected error occurred: " + e.getMessage());
         }
     }
 }
