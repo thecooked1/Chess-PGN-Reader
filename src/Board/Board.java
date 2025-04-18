@@ -350,7 +350,7 @@ public class Board {
         return grid[row][col];
     }
 
-  /*  public void setPiece(int row, int col, Piece piece) {
+    public void setPiece(int row, int col, Piece piece) {
         if (isValidPosition(row, col)) {
             grid[row][col] = piece;
         }
@@ -373,12 +373,12 @@ public class Board {
         if (enPassantTarget != null) {
             char file = (char)('a' + enPassantTarget[1]);
             int rank = 8 - enPassantTarget[0];
-            System.out.println("En Passant Target: " + file + rank + " (Board coords: " + enPassantTarget[0]+","+enPassantTarget[1]+")");
+            /*System.out.println("En Passant Target: " + file + rank + " (Board coords: " + enPassantTarget[0]+","+enPassantTarget[1]+")");
         } else {
-            System.out.println("En Passant Target: None");
+            System.out.println("En Passant Target: None");*/
         }
     }
 
-   */
+
 }
 

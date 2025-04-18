@@ -20,7 +20,8 @@ public class Game {
         System.out.println("White: " + game.getHeaders().getOrDefault("White", "Unknown"));
         System.out.println("Black: " + game.getHeaders().getOrDefault("Black", "Unknown"));
         System.out.println("Event: " + game.getHeaders().getOrDefault("Event", "Unknown"));
-        // board.printBoard();
+
+         board.printBoard();
 
         try {
             for (String token : moveTokens) {
@@ -64,6 +65,7 @@ public class Game {
             e.printStackTrace();
             return false;
         }
+        board.printBoard();
 
         System.out.println("Game #" + gameNumber + " finished successfully. Result: " + game.getResult() + '\n');
         return true;

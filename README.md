@@ -58,6 +58,18 @@ Output should look like this (For one game and If no errors were found)
 White: Kasimdzhanov,R
 Black: Grischuk,A
 Event: Tbilisi FIDE GP 2015
+  a b c d e f g h
+ +-----------------+
+8|R N B Q K B N R |8
+7|P P P P P P P P |7
+6|. . . . . . . . |6
+5|. . . . . . . . |5
+4|. . . . . . . . |4
+3|. . . . . . . . |3
+2|P P P P P P P P |2
+1|R N B Q K B N R |1
+ +-----------------+
+  a b c d e f g h
 1. White: d4
 1... Black: d5
 2. White: c4
@@ -128,6 +140,18 @@ Event: Tbilisi FIDE GP 2015
 34... Black: Rcf8
 35. White: Qd1
 35... Black: Rxf2
+  a b c d e f g h
+ +-----------------+
+8|. . . . . R . K |8
+7|. . P . . . P P |7
+6|. . . . . . . . |6
+5|P . . . . . . . |5
+4|R . . P . . P . |4
+3|. . . . P . . . |3
+2|. P . Q . R P P |2
+1|. . . Q . R K . |1
+ +-----------------+
+  a b c d e f g h
 Game #1 finished successfully. Result: 0-1
 ```
 
